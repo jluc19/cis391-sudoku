@@ -1,0 +1,16 @@
+Jason Lucibello
+CIS391 HW3
+
+1a) What are the variables of this CSP?
+The variables of the CSP are the 81 cells that can hold values.
+
+b) What are their domains?
+Each cell can take the domain {1,2,3,4,5,6,7,8,9}, or the possible values for a given Sudoku cell
+
+c) How would you translate the requirement that no two of the same digit may occur in the same row, column, or block into binary constraints?
+
+We could translate this requirement into a set of 810 different binary comparisons of sets of 2 cells. We know that a given cell can interact with 20 possible different cells to determine if it satisfies these constraints (8 for row, 8 for columns, and 4 for the block that it is a part of which are not part of the row or column). With 81 different cells, this yields 810 binary comparisons.
+
+d) Do you need to explicitly constrain each digit to occur at least once in the row, col and block? Why or why not?
+
+No. Although this is in fact a constraint of the sudoku board, our binary implementation implicitly accounts for this. We say that a cell cannot be the same as the the eight other cells in its row, the eight in its column, or the eight in its box (minus the 4 overlaps). In effect, this is saying that the digits must be unique, and given that there are 9 spaces for the digits 1-9, it implicitly means that each digit must occur once in each row, block, and column.

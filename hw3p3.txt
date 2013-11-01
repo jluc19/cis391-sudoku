@@ -1,0 +1,6 @@
+Jason Lucibello
+CIS391 HW3
+
+3) We will consider that the sudoku board is a 9x9 grid with range (0:8,0:8). In the lower-right hand block, the 8 can only go in the bottom right-most cell (8,8). This is because there are 8's in positions (6,1) and (7,3), and we cannot have more than one 8 in a column. Therefore, (6,6), (6,7), (6,8), (7,6), (7,7), and (7,8) cannot contain an 8. Our problem lies in that this is not explicitly part of the constraint problem laid out in problem 2.
+
+This strategy suggests that we can further optimize our algorithm by explicitly using the constraint that each row and column must have exactly one copy of each number and must contain every digit in that range. This should be for every row, column, and box. This is shown in my function in the assign_stragglers function.
