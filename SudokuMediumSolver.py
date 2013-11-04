@@ -1,5 +1,4 @@
-import re, sys, itertools, copy
-from utils import argmax
+import sys, itertools, copy
 
 def read(filename):
 	inFile=open(filename, "r")
@@ -22,6 +21,8 @@ class SudokuGrid(object):
 		self.domain = dict((var, self.startingDomain[:] if value == '*' else [value]) for var, value in enumerate(list(itertools.chain(*grid))))
 		self.var = self.domain.keys()
 		self.arcs = self.makeArcs(grid)
+		self.pruning = dict((var, []) for var in self.var)
+		self.original_domain = self.domain
 
 		self.rows = grid
 		self.cols = [[grid[x][y] for x in range(9)] for y in range(9)]
@@ -41,26 +42,19 @@ class SudokuGrid(object):
 		arcSet = dict((i, set(list(itertools.chain(*overlap[i])))-set([i])) for i in self.var)
 		return arcSet
 
-	def constraint(self, x, y):
-		return x != y
-
 	def solved(self):
 		return len(list(itertools.chain(*self.domain.values()))) == len(self.var)
 
 #_____________________________________________________________________________
 #Solving functions (problems 2,4,6)
 
-def solve_p2(sudokuGrid):
-	runAC3(sudokuGrid)
-	updateRCB(sudokuGrid)
-
-def solve_p4(sudokuGrid):
+def SudokuMediumSolver(sudokuGrid):
 	while not sudokuGrid.solved():
 		old_domain = copy.deepcopy(sudokuGrid.domain)
 		runAC3(sudokuGrid)
-		updateRCB(sudokuGrid)
 		assign_stragglers(sudokuGrid)
 		new_domain = sudokuGrid.domain
+		updateRCB(sudokuGrid)
 		if new_domain != old_domain:
 			continue
 		else:
@@ -81,14 +75,12 @@ def updateRCB(sudokuGrid):
 def assign_stragglers(sudokuGrid):
 	for group in sudokuGrid.rcb:
 		group_dict = dict((i, [index for index in group if str(i) in sudokuGrid.domain[index]]) for i in range(1, 10))
-		#print "GROUP DICT: ", group_dict
 		for number in group_dict:
 			if len(group_dict[number]) == 1:
 				sudokuGrid.domain[group_dict[number][0]] = [str(number)]
 
 def printGrid(sudokuGrid):
-	if(1):
-	#if(sudokuGrid.solved()):
+	if(sudokuGrid.solved()):
 		endGrid = sudokuGrid.grid
 		print "Completed Sudoku:"
 		for row in endGrid:
@@ -116,19 +108,13 @@ def runAC3(sudokuGrid):
 def revise(sudokuGrid, a, b):
 	revised = False
 	for x in sudokuGrid.domain[a]:
-		if all(not sudokuGrid.constraint(x,y) for y in sudokuGrid.domain[b]):
+		if all(x == y for y in sudokuGrid.domain[b]):
 			sudokuGrid.domain[a].remove(x)
 			revised = True
 	return revised
 
-#to run the function as the medium solver, type 'python SudokuMediumSolver.py "puzzle" 2'
 if __name__ == '__main__':
 	grid = read(sys.argv[1])
 	runSudoku= SudokuGrid(grid)
-	if(sys.argv[2] == '1'):
-		solve_p2(runSudoku)
-	elif(sys.argv[2] == '2'):
-		solve_p4(runSudoku)
+	SudokuMediumSolver(runSudoku)
 	printGrid(runSudoku)
-
-

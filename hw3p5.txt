@@ -1,4 +1,4 @@
 Jason Lucibello
 CIS391 HW3
 
-5) To solve this problem with guessing, we can use recursion, implementing a backtracing algorithm on the puzzle with forward tracing to guage whether the guess was corect or not. If we ever get to a non solvable board, we simply go back to the previous board and make the next guess. If all guesses have been accounted for in the current iteration, a previous guess in the decision tree must have been wrong, so we go up another level.
+5) To solve this problem with guessing, we can use recursion, implementing a backtracing algorithm on the puzzle with forward tracing to guage whether the guess was corect or not. If we ever get to a non solvable board, we simply go back to a previous board that is potentially valid and make the next guess. If all guesses have been accounted for in the current iteration, a previous guess in the decision tree must have been wrong, so we go up another level.

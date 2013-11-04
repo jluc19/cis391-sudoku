@@ -1,5 +1,4 @@
-import re, sys, itertools, copy
-from utils import argmax
+import sys, itertools, copy
 
 def read(filename):
 	inFile=open(filename, "r")
@@ -66,11 +65,7 @@ class SudokuGrid(object):
 #_____________________________________________________________________________
 #Solving functions (problems 2,4,6)
 
-def solve_p2(sudokuGrid):
-	runAC3(sudokuGrid)
-	updateRCB(sudokuGrid)
-
-def solve_p4(sudokuGrid):
+def SudokuMediumSolver(sudokuGrid):
 	while not sudokuGrid.solved():
 		old_domain = copy.deepcopy(sudokuGrid.domain)
 		runAC3(sudokuGrid)
@@ -82,10 +77,10 @@ def solve_p4(sudokuGrid):
 		else:
 			break
 
-def solve_p6(sudokuGrid):
+def SudokuSolver(sudokuGrid):
 	#we run the same algorithm as problem 4, with a twist of guessing
 	#once traditional methods fail we run backtracking to recursively guess
-	solve_p4(sudokuGrid)
+	SudokuMediumSolver(sudokuGrid)
 	output = None
 	sudokuGrid.original_domain = copy.deepcopy(sudokuGrid.domain)
 	if(not sudokuGrid.solved()):
@@ -149,7 +144,7 @@ def revise(sudokuGrid, a, b):
 			revised = True
 	return revised
 
-#adapted from slides/AI Textbook
+#warped version based on AI Slides & Textbook
 def backtrack(sudokuGrid, assignment):
 	if sudokuGrid.solved():
 		return True
@@ -200,10 +195,5 @@ def assign_var(sudokuGrid, assignment):
 if __name__ == '__main__':
 	grid = read(sys.argv[1])
 	runSudoku= SudokuGrid(grid)
-	if(sys.argv[2] == '1'):
-		solve_p2(runSudoku)
-	elif(sys.argv[2] == '2'):
-		solve_p4(runSudoku)
-	else:
-		solve_p6(runSudoku)
+	SudokuSolver(runSudoku)
 	printGrid(runSudoku)
