@@ -1,0 +1,97 @@
+Jason Lucibello
+CIS391 HW3
+
+ac3solvable_example output
+
+8 2 1 5 6 4 3 9 7
+
+5 9 3 8 1 7 4 6 2
+
+4 6 7 9 3 2 8 1 5
+
+7 5 8 2 4 1 6 3 9
+
+1 3 6 7 9 5 2 8 4
+
+2 4 9 6 8 3 7 5 1
+
+6 8 5 4 2 9 1 7 3
+
+3 7 4 1 5 6 9 2 8
+
+9 1 2 3 7 8 5 4 6
+
+
+dp_puzzle output
+
+* 1 5 * 2 * * * 9
+
+* 4 * * * * 7 * *
+
+* 2 7 * * 8 * * *
+
+9 5 * * * 3 2 * *
+
+7 * * * * * * * 6
+
+* * 6 2 * * * 1 5
+
+* * * 6 * * 9 2 *
+
+* * 4 * * * * 8 *
+
+2 * * * 3 * 6 5 *
+
+Index:  0 Domain:  ['3', '6', '8']
+Index:  3 Domain:  ['3', '4', '7']
+Index:  5 Domain:  ['4', '6', '7']
+Index:  6 Domain:  ['3', '4', '8']
+Index:  7 Domain:  ['3', '4', '6']
+Index:  9 Domain:  ['3', '6', '8']
+Index:  11 Domain:  ['3', '8', '9']
+Index:  12 Domain:  ['1', '3', '5', '9']
+Index:  13 Domain:  ['1', '5', '6', '9']
+Index:  14 Domain:  ['1', '5', '6', '9']
+Index:  16 Domain:  ['3', '6']
+Index:  17 Domain:  ['1', '2', '3', '8']
+Index:  18 Domain:  ['3', '6']
+Index:  21 Domain:  ['1', '3', '4', '5', '9']
+Index:  22 Domain:  ['1', '4', '5', '6', '9']
+Index:  24 Domain:  ['1', '3', '4', '5']
+Index:  25 Domain:  ['3', '4', '6']
+Index:  26 Domain:  ['1', '3', '4']
+Index:  29 Domain:  ['1', '8']
+Index:  30 Domain:  ['1', '4', '7', '8']
+Index:  31 Domain:  ['1', '4', '6', '7', '8']
+Index:  34 Domain:  ['4', '7']
+Index:  35 Domain:  ['4', '7', '8']
+Index:  37 Domain:  ['3', '8']
+Index:  38 Domain:  ['1', '2', '3', '8']
+Index:  39 Domain:  ['1', '4', '5', '8', '9']
+Index:  40 Domain:  ['1', '4', '5', '8', '9']
+Index:  41 Domain:  ['1', '4', '5', '9']
+Index:  42 Domain:  ['3', '4', '8']
+Index:  43 Domain:  ['3', '4', '9']
+Index:  45 Domain:  ['3', '4', '8']
+Index:  46 Domain:  ['3', '8']
+Index:  49 Domain:  ['4', '7', '8', '9']
+Index:  50 Domain:  ['4', '7', '9']
+Index:  51 Domain:  ['3', '4', '8']
+Index:  54 Domain:  ['1', '3', '5', '8']
+Index:  55 Domain:  ['3', '7', '8']
+Index:  56 Domain:  ['1', '3', '8']
+Index:  58 Domain:  ['1', '4', '5', '7', '8']
+Index:  59 Domain:  ['1', '4', '5', '7']
+Index:  62 Domain:  ['1', '3', '4', '7']
+Index:  63 Domain:  ['1', '3', '5', '6']
+Index:  64 Domain:  ['3', '6', '7', '9']
+Index:  66 Domain:  ['1', '5', '7', '9']
+Index:  67 Domain:  ['1', '5', '7', '9']
+Index:  68 Domain:  ['1', '2', '5', '7', '9']
+Index:  69 Domain:  ['1', '3']
+Index:  71 Domain:  ['1', '3', '7']
+Index:  73 Domain:  ['7', '8', '9']
+Index:  74 Domain:  ['1', '8', '9']
+Index:  75 Domain:  ['1', '4', '7', '8', '9']
+Index:  77 Domain:  ['1', '4', '7', '9']
+Index:  80 Domain:  ['1', '4', '7']
