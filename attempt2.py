@@ -23,6 +23,7 @@ class SudokuGrid(object):
 		self.var = self.domain.keys()
 		self.arcs = self.makeArcs(grid)
 		self.pruning = dict((var, []) for var in self.var)
+		self.original_domain = self.domain
 
 		self.rows = grid
 		self.cols = [[grid[x][y] for x in range(9)] for y in range(9)]
@@ -42,50 +43,25 @@ class SudokuGrid(object):
 		arcSet = dict((i, set(list(itertools.chain(*overlap[i])))-set([i])) for i in self.var)
 		return arcSet
 
-	def constraint(self, x, y):
-		return x != y
-
 	def solved(self):
 		return len(list(itertools.chain(*self.domain.values()))) == len(self.var)
 
-	
+	def undo_forward(self, var):
+		for (oldVar, oldValue) in self.pruning[var]:
+			if oldValue not in self.domain[oldVar]:
+				self.domain[oldVar].append(oldValue)
+			self.pruning[var] = []
+
 	def forward_check(self, var, assignment):
-		#create pruned list
-		#prune
-		print "DOMAIN: ", self.domain
-		print "ARCS: ", self.arcs[var]
 		for arc in self.arcs[var]:
-			#print arc
-			#print self.domain[arc]
 			for value in self.domain[arc]:
-				#print "TO-REMOVE, ", value
-				if not self.constraint(assignment[var], value):
+				if assignment[var] == value:
 					self.pruning[var].append((arc, value))
 					self.domain[arc].remove(value)
-					print "PRUNING: ", self.pruning[var]
 				if self.domain[arc] == []:
-					for (oldVar, oldValue) in self.pruning[var]:
-						#print "UNDO: ", self.domain[oldVar]
-						self.domain[oldVar].append(oldValue)
-						self.pruning[var] = []
-					print "WE HAVE A FAILURE! FAILURE!"
-					return False		
+					self.undo_forward(var)
+					return False	
 		return True
-		#if ever an empty list, unprune everything and return false
-		#return True#if success, return true
-
-	def add_assign(self, var, val, assignment=None):
-			#print "VAL VAR: ", val, var
-			old_domain = copy.deepcopy(self.domain)
-			#print "old_domain: ", self.domain
-			success = self.forward_check(var, val, assignment)
-			return success
-
-	def remove_assign(self, var, assignment):
-		if var in assignment:
-			#self.domain[var] = self.domains[var][:]
-			del assignment[var]
-
 
 #_____________________________________________________________________________
 #Solving functions (problems 2,4,6)
@@ -98,9 +74,9 @@ def solve_p4(sudokuGrid):
 	while not sudokuGrid.solved():
 		old_domain = copy.deepcopy(sudokuGrid.domain)
 		runAC3(sudokuGrid)
-		updateRCB(sudokuGrid)
 		assign_stragglers(sudokuGrid)
 		new_domain = sudokuGrid.domain
+		updateRCB(sudokuGrid)
 		if new_domain != old_domain:
 			continue
 		else:
@@ -111,13 +87,12 @@ def solve_p6(sudokuGrid):
 	#once traditional methods fail we run backtracking to recursively guess
 	solve_p4(sudokuGrid)
 	output = None
+	sudokuGrid.original_domain = copy.deepcopy(sudokuGrid.domain)
 	if(not sudokuGrid.solved()):
 		assignment = dict((key,value) for key,value in sudokuGrid.domain.iteritems() if len(value) == 1) 
-		print "PRUNING: ", sudokuGrid.pruning
-		print "ASSIGNMENT: ", assignment
 		output = backtrack(sudokuGrid, assignment)
 		if output is None:
-			print "Backtracking didn't work. \n"
+			print "Uh oh. There was a problem. \n"
 		else:
 			updateRCB(sudokuGrid)
 
@@ -141,8 +116,7 @@ def assign_stragglers(sudokuGrid):
 				sudokuGrid.domain[group_dict[number][0]] = [str(number)]
 
 def printGrid(sudokuGrid):
-	if(1):
-	#if(sudokuGrid.solved()):
+	if(sudokuGrid.solved()):
 		endGrid = sudokuGrid.grid
 		print "Completed Sudoku:"
 		for row in endGrid:
@@ -170,53 +144,58 @@ def runAC3(sudokuGrid):
 def revise(sudokuGrid, a, b):
 	revised = False
 	for x in sudokuGrid.domain[a]:
-		if all(not sudokuGrid.constraint(x,y) for y in sudokuGrid.domain[b]):
+		if all(x == y for y in sudokuGrid.domain[b]):
 			sudokuGrid.domain[a].remove(x)
 			revised = True
 	return revised
 
 #adapted from slides/AI Textbook
 def backtrack(sudokuGrid, assignment):
-	#print sudokuGrid.solved()
+	if sudokuGrid.solved():
+		return True
 	while not sudokuGrid.solved():
-		updateRCB(sudokuGrid)
-		printGrid(sudokuGrid)
 		if len(assignment) == len(sudokuGrid.var):
 			break
 		var = assign_var(sudokuGrid, assignment)
 		var_domain = sudokuGrid.domain[var]
 		assignment[var] = var_domain[0]
 		sudokuGrid.domain[var] = [var_domain[0]]
-		print "GUESS: THE FIRST ONE", var, var_domain
 		successful_guess = sudokuGrid.forward_check(var, assignment)
 		if successful_guess:
 			recurse = backtrack(sudokuGrid, assignment)
 			if not recurse:
-				print "ATTENTION:", sudokuGrid.domain, "\n",var_domain
+				sudokuGrid.undo_forward(var)
 				sudokuGrid.domain[var] = var_domain
 				assignment.pop(var,0)
-				successful_guess = not successful_guess
-		if not successful_guess:
+				if len(sudokuGrid.domain[var]) == 1:
+					sudokuGrid.pruning[var] = []
+					sudokuGrid.domain[var] = sudokuGrid.original_domain[var]
+					return False
+				else:
+					sudokuGrid.domain[var] = var_domain[1:]
+			else:
+				return True
+		else:
+			assignment.pop(var,0)
 			sudokuGrid.domain[var] = var_domain[1:]
-			print "VAR_DOMAIN RIGHT HERE", var, var_domain, sudokuGrid.domain[var]
 			if sudokuGrid.domain[var] == []:
+				sudokuGrid.domain[var] = sudokuGrid.original_domain[var]
 				return False
-
-
-		#if forward check successful, recurse with next guess
-		#if unsuccessful, remove first value from dict domain and reset to assignment
-		#if no guesses remain, the previous guess must have been wrong
+			else:
+				continue
+	assign_stragglers(sudokuGrid)
+	updateRCB(sudokuGrid)
 
 #we use Most Constrained Variable (MRV) to determine the unassigned value
 def assign_var(sudokuGrid, assignment):
 	unassigned = [v for v in sudokuGrid.var if v not in assignment]
-	min_val = 0
+	min_val = 9
 	ret_var = 0
 	for var in unassigned:
-		if -len(sudokuGrid.domain[var]) < min_val:
+		if len(sudokuGrid.domain[var]) < min_val:
+			min_val = len(sudokuGrid.domain[var])
 			ret_var = var
 	return ret_var
-
 
 if __name__ == '__main__':
 	grid = read(sys.argv[1])
