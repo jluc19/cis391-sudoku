@@ -1,4 +1,4 @@
-import sys, itertools, copy
+import sys, itertools, copy, re
 from datetime import datetime
 
 def read(filename):
@@ -113,10 +113,12 @@ def printGrid(sudokuGrid):
 	if(sudokuGrid.solved()):
 		endGrid = sudokuGrid.grid
 		print "Completed Sudoku:"
-		for row in endGrid:
-			for i in row:
-				print(i),
-			print "\n"
+		for i, row in enumerate(endGrid):
+			left = row[:3]
+			center = row[3:6]
+			right = row[6:]
+			print ' '.join(left), '|', ' '.join(center), '|', ' '.join(right)
+			if (i+1)%3 ==0 and i < 8: print '---------------------'
 	else:
 		print "No Solution, Remaining Domains: "
 		for domain in sudokuGrid.domain:
@@ -133,6 +135,7 @@ def runAC3(sudokuGrid):
 		if revise(sudokuGrid, i, j):
 			for k in sudokuGrid.arcs[i]:
 				queue.append((k, i))
+
 
 #adapted from code in AI Textbook
 def revise(sudokuGrid, a, b):
