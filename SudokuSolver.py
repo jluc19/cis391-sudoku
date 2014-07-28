@@ -1,4 +1,5 @@
 import sys, itertools, copy
+from datetime import datetime
 
 def read(filename):
 	inFile=open(filename, "r")
@@ -63,8 +64,7 @@ class SudokuGrid(object):
 		return True
 
 #_____________________________________________________________________________
-#Solving functions (problems 2,4,6)
-
+#solver without guessing
 def SudokuMediumSolver(sudokuGrid):
 	while not sudokuGrid.solved():
 		old_domain = copy.deepcopy(sudokuGrid.domain)
@@ -78,7 +78,6 @@ def SudokuMediumSolver(sudokuGrid):
 			break
 
 def SudokuSolver(sudokuGrid):
-	#we run the same algorithm as problem 4, with a twist of guessing
 	#once traditional methods fail we run backtracking to recursively guess
 	SudokuMediumSolver(sudokuGrid)
 	output = None
@@ -157,8 +156,7 @@ def backtrack(sudokuGrid, assignment):
 		sudokuGrid.domain[var] = [var_domain[0]]
 		successful_guess = sudokuGrid.forward_check(var, assignment)
 		if successful_guess:
-			recurse = backtrack(sudokuGrid, assignment)
-			if not recurse:
+			if not backtrack(sudokuGrid, assignment):
 				sudokuGrid.undo_forward(var)
 				sudokuGrid.domain[var] = var_domain
 				assignment.pop(var,0)
@@ -185,15 +183,17 @@ def backtrack(sudokuGrid, assignment):
 def assign_var(sudokuGrid, assignment):
 	unassigned = [v for v in sudokuGrid.var if v not in assignment]
 	min_val = 9
-	ret_var = 0
-	for var in unassigned:
-		if len(sudokuGrid.domain[var]) < min_val:
-			min_val = len(sudokuGrid.domain[var])
-			ret_var = var
-	return ret_var
+	result = 0
+	for option in unassigned:
+		if len(sudokuGrid.domain[option]) < min_val:
+			min_val = len(sudokuGrid.domain[option])
+			result = option
+	return result
 
 if __name__ == '__main__':
+	startTime = datetime.now()
 	grid = read(sys.argv[1])
 	runSudoku= SudokuGrid(grid)
 	SudokuSolver(runSudoku)
 	printGrid(runSudoku)
+	print("Time to solve: ", str(datetime.now() - startTime))
